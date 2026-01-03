@@ -1,0 +1,46 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Final - Joyeux Anniversaire</title>
+  <link href="https://fonts.googleapis.com/css2?family=Pacifico&family=Quicksand:wght@400;600&display=swap" rel="stylesheet">
+  <style>
+    :root{--bg1:#FFE4E1;--bg2:#FFB6C1;--accent:#FF1493}
+    html,body{height:100%;margin:0;font-family:Quicksand,Arial,sans-serif;background:linear-gradient(135deg,var(--bg1) 0%,var(--bg2) 100%);display:flex;align-items:center;justify-content:center}
+    .card{max-width:900px;padding:36px;border-radius:16px;text-align:center}
+    h1{font-family:Pacifico,Quicksand,Arial,sans-serif;color:var(--accent);font-size:48px;margin:6px}
+    .message{font-size:20px;color:#6b0030;margin-top:18px;line-height:1.6}
+    .hearts{position:fixed;left:0;top:0;pointer-events:none;width:100%;height:100%;overflow:hidden}
+    @media (max-width:600px){h1{font-size:32px}.message{font-size:18px}}
+  </style>
+</head>
+<body>
+  <div class="card">
+    <h1>Joyeux Anniversaire Mon Amour ! 🎂❤️</h1>
+    <div class="message">
+      Mon amour,<br><br>
+      Aujourd'hui est un jour spécial parce que c'est le tien.<br>
+      Tu illumines chaque instant de ma vie. Tu es ma joie, mon rire, ma force, mon refuge.<br><br>
+      Merci d'exister et d'être toi.<br>
+      Je t'aime plus que tout au monde.<br><br>
+      Joyeux anniversaire, mon trésor ! 💖✨<br><br>
+      Avec tout mon amour,
+      <div style="font-weight:700;margin-top:12px">— [Ton prénom]</div>
+    </div>
+  </div>
+
+  <div class="hearts" id="hearts"></div>
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+  <script>
+    (function(){
+      // gentle confetti
+      if(window.confetti){
+        setInterval(()=>{
+          confetti({particleCount: 6, spread: 40, origin: { x: Math.random() }, colors:['#FFB6C1','#FF69B4','#FFC0CB']});
+        }, 600);
+      }
+    })();
+  </script>
+</body>
+</html>

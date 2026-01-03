@@ -1,0 +1,126 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Souffle la bougie</title>
+  <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@400;600&display=swap" rel="stylesheet">
+  <style>
+    :root{--baby-pink:#FFC0CB;--deep-pink:#b3003b}
+    *{box-sizing:border-box}
+    html,body{height:100%;margin:0;font-family:Quicksand,Arial,sans-serif;background:linear-gradient(180deg,#FFF0F6,#FFC0CB);}
+    .wrap{min-height:100%;display:flex;align-items:center;justify-content:center;padding:24px}
+    .card{max-width:620px;width:100%;text-align:center;padding:24px;border-radius:14px}
+    h1{color:var(--deep-pink);font-size:2rem;margin:6px}
+
+    /* Candle */
+    .stage{display:flex;flex-direction:column;align-items:center;gap:18px}
+    .candle-wrap{position:relative;width:120px;height:260px;display:flex;align-items:flex-end;justify-content:center}
+    .candle-body{width:80px;height:200px;background:linear-gradient(180deg,#fff9fb,#ffdceb);border-radius:12px;border-bottom-left-radius:18px;border-bottom-right-radius:18px;box-shadow:0 8px 20px rgba(0,0,0,0.12);position:relative;display:flex;align-items:flex-start;justify-content:center}
+    .wick{width:4px;height:18px;background:#333;position:absolute;top:10px;border-radius:2px}
+    .flame{position:absolute;top:-10px;width:36px;height:56px;background:linear-gradient(180deg,#ffff00 0%,#ffcc00 30%,#ff9900 60%,#ff6600 100%);border-radius:50% 50% 50% 50%/60% 60% 40% 40%;box-shadow:0 0 20px #ffcc00,0 0 40px #ff9900,0 0 60px #ff6600;animation:flicker .4s infinite alternate;transform-origin:center bottom}
+    @keyframes flicker{0%{transform:scale(1) rotate(-3deg)}50%{transform:scale(1.08) rotate(3deg)}100%{transform:scale(1) rotate(-3deg)}}
+
+    /* extinguish */
+    .flame.extinguished{animation:none;animation-fill-mode:forwards;animation:extinguish .5s forwards}
+    @keyframes extinguish{0%{opacity:1;transform:scale(1)}50%{opacity:.5;transform:scale(.5) translateY(-10px)}100%{opacity:0;transform:scale(0) translateY(-20px);}}
+
+    .blow-instruction{color:#6b0030}
+    .btn-blow{margin-top:8px;background:#FF69B4;color:white;border:none;padding:12px 18px;border-radius:999px;font-size:16px;cursor:pointer;box-shadow:0 8px 20px rgba(255,105,180,0.2);transition:transform .2s}
+    .btn-blow:hover{transform:scale(1.03)}
+
+    /* After blow: slideshow and message */
+    .after{display:none;flex-direction:column;align-items:center;gap:16px}
+    .message{font-size:20px;color:#8b0030;animation:afterShow .9s ease forwards;opacity:0}
+    @keyframes afterShow{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+
+    /* GIFs around candle */
+    .candle-container{position:relative;display:flex;justify-content:center;align-items:center;min-height:420px}
+    .gif{position:absolute;width:100px;height:100px;border-radius:10px}
+    .gif-top{top:20px;left:50%;transform:translateX(-50%)}
+    .gif-right{right:30px;top:50%;transform:translateY(-50%)}
+    .gif-left{left:30px;top:50%;transform:translateY(-50%)}
+    .gif-bottom{bottom:20px;left:50%;transform:translateX(-50%)}
+
+    @media (max-width:600px){
+      .candle-wrap{width:90px;height:200px}
+      .candle-body{width:60px;height:150px}
+      .flame{width:26px;height:40px}
+      .gif{width:70px;height:70px}
+      .candle-container{min-height:340px}
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="card">
+      <h1>Fais un vœu et souffle ! 💫</h1>
+      <div class="stage">
+        <div class="candle-container">
+          <img src="res/victory/1.gif" class="gif gif-top" alt="gif1">
+          <img src="res/victory/2.gif" class="gif gif-right" alt="gif2">
+          <img src="res/victory/3.gif" class="gif gif-left" alt="gif3">
+          <img src="res/victory/4.gif" class="gif gif-bottom" alt="gif4">
+
+          <div id="before" class="before">
+            <div class="candle-wrap" id="candleWrap">
+              <div class="candle-body" id="candleBody">
+                <div class="wick"></div>
+              </div>
+              <div class="flame" id="flame"></div>
+            </div>
+            <div class="blow-instruction">Clique sur la bougie pour souffler</div>
+            <button id="blowBtn" class="btn-blow">Souffler la bougie 🕯️</button>
+          </div>
+
+          <div id="after" class="after">
+            <div class="message">Tes vœux se réalisent ! 💖</div>
+          </div>
+        </div>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+  <audio id="music" loop>
+    <source src="res/sounds/happy-birthday.mp3" type="audio/mpeg">
+  </audio>
+  <script>
+    (function(){
+      const blowBtn = document.getElementById('blowBtn');
+      const before = document.getElementById('before');
+      const after = document.getElementById('after');
+      const flame = document.getElementById('flame');
+      const music = document.getElementById('music');
+      const candleWrap = document.getElementById('candleWrap');
+
+      function launchConfetti(){
+        if(!window.confetti) return;
+        const duration = 3000;
+        const end = Date.now() + duration;
+        (function frame(){
+          confetti({particleCount: 6, angle: 60, spread: 55, origin: { x: 0 }});
+          confetti({particleCount: 6, angle: 120, spread: 55, origin: { x: 1 }});
+          if (Date.now() < end) requestAnimationFrame(frame);
+        }());
+      }
+
+      function blow(){
+        // extinguish flame with CSS class
+        flame.classList.add('extinguished');
+        // after flame animation (0.5s) show after state
+        setTimeout(()=>{
+          before.style.display = 'none';
+          after.style.display = 'flex';
+          // start music
+          if(music){ music.volume = 0.7; music.play().catch(()=>{}); }
+          // confetti
+          launchConfetti();
+        }, 500);
+      }
+
+      blowBtn.addEventListener('click', blow);
+      candleWrap.addEventListener('click', blow);
+    })();
+  </script>
+</body>
+</html>

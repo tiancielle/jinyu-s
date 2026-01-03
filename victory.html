@@ -1,0 +1,131 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Joyeux Anniversaire — Victoire</title>
+  <link href="https://fonts.googleapis.com/css2?family=Pacifico&family=Quicksand:wght@400;600&display=swap" rel="stylesheet">
+  <style>
+    :root{--baby-pink:#FFC0CB;--deep-pink:#FF1493}
+    *{box-sizing:border-box}
+    html,body{height:100%;margin:0;font-family:Quicksand,Arial,sans-serif;background:radial-gradient(circle,#FFE4E1 0%,#FFB6C1 100%);}
+    .wrap{min-height:100%;display:flex;align-items:center;justify-content:center;padding:24px}
+    .card{max-width:980px;width:100%;text-align:center;padding:24px;border-radius:14px}
+    h1{font-family:Pacifico,Quicksand,Arial,sans-serif;color:var(--deep-pink);font-size:36px;margin:6px}
+    .subtitle{color:#8b0030;margin-bottom:12px}
+
+    /* candle & GIF layout */
+    .candle-container{position:relative;display:flex;justify-content:center;align-items:center;min-height:420px}
+    .gif{position:absolute;width:150px;height:150px;border-radius:15px;object-fit:cover;box-shadow:0 8px 20px rgba(0,0,0,0.15)}
+    .gif-right{right:60px;top:50%;transform:translateY(-50%)}
+    .gif-left{left:60px;top:50%;transform:translateY(-50%)}
+
+    .candle-wrap{position:relative;width:120px;height:260px;display:flex;align-items:flex-end;justify-content:center}
+    .candle-body{width:80px;height:200px;background:linear-gradient(180deg,#FFE4E1,#FFB6C1);border-radius:12px;border-bottom-left-radius:18px;border-bottom-right-radius:18px;box-shadow:0 10px 30px rgba(0,0,0,0.2);position:relative;display:flex;align-items:flex-start;justify-content:center}
+    .wick{width:4px;height:20px;background:#333;position:absolute;top:10px;border-radius:2px}
+    .flame{position:absolute;top:-10px;width:36px;height:56px;background:linear-gradient(180deg,#ffff00 0%,#ffcc00 30%,#ff9900 60%,#ff6600 100%);border-radius:50% 50% 50% 50%/60% 60% 40% 40%;box-shadow:0 0 20px #ffcc00,0 0 40px #ff9900,0 0 60px #ff6600;animation:flicker .4s infinite alternate;transform-origin:center bottom}
+    @keyframes flicker{0%{transform:scale(1) rotate(-3deg)}50%{transform:scale(1.08) rotate(3deg)}100%{transform:scale(1) rotate(-3deg)}}
+    .flame.extinguished{animation:none;animation-fill-mode:forwards;animation:extinguish .5s forwards}
+    @keyframes extinguish{0%{opacity:1;transform:scale(1)}50%{opacity:.5;transform:scale(.5) translateY(-10px)}100%{opacity:0;transform:scale(0) translateY(-20px);}}
+
+    .action-row{margin-top:18px}
+    .hint{color:#6b0030;margin-top:8px}
+
+    @media (max-width:1024px){
+      .gif{width:120px;height:120px}
+    }
+    @media (max-width:768px){
+      h1{font-size:28px}
+      .gif{width:100px;height:100px}
+      .gif-right{right:20px}
+      .gif-left{left:20px}
+      .candle-wrap{width:90px;height:200px}
+      .candle-body{width:60px;height:150px}
+      .flame{width:26px;height:40px}
+      .candle-container{min-height:320px}
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="card">
+      <h1>Happiest birthday to youu bibiiich! 🎉❤️💖</h1>
+      <div class="subtitle" id="subtitle">Make a wish and blow out the candle! 💫</div>
+
+      <div class="candle-container">
+        <img src="res/victory/2.gif" class="gif gif-right" alt="gif2">
+        <img src="res/victory/3.gif" class="gif gif-left" alt="gif3">
+
+        <div class="candle-wrap" id="candleWrap">
+          <div class="candle-body">
+            <div class="wick"></div>
+          </div>
+          <div class="flame" id="flame"></div>
+        </div>
+      </div>
+
+      <div class="action-row">
+        <button id="blowBtn" class="btn" style="background:#FF69B4;padding:12px 22px;border-radius:999px;color:#fff;border:none;box-shadow:0 10px 20px rgba(255,105,180,0.25);">Souffler la bougie 🕯️</button>
+        <div class="hint">Clic on the candle or the button to blow it out</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- confetti -->
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+
+  <!-- audio -->
+  <audio id="victoryMusic" autoplay loop playsinline>
+    <source src="res/sounds/happy-birthday.mp3" type="audio/mpeg">
+  </audio>
+
+  <script>
+    (function(){
+      const flame = document.getElementById('flame');
+      const blowBtn = document.getElementById('blowBtn');
+      const candleWrap = document.getElementById('candleWrap');
+      const subtitle = document.getElementById('subtitle');
+      const music = document.getElementById('victoryMusic');
+
+      function launchConfetti(duration = 5000){
+        if(!window.confetti) return;
+        const end = Date.now() + duration;
+        (function frame(){
+          confetti({particleCount: 40, angle: 60, spread: 55, origin: { x: 0 }, colors: ['#FFB6C1','#FF69B4','#FFFFFF','#D4AF37']});
+          confetti({particleCount: 40, angle: 120, spread: 55, origin: { x: 1 }, colors: ['#FFB6C1','#FF69B4','#FFFFFF','#D4AF37']});
+          if(Date.now() < end) requestAnimationFrame(frame);
+        }());
+      }
+
+      // auto confetti and robust music start on load
+      window.addEventListener('DOMContentLoaded', ()=>{
+        launchConfetti(5000);
+        if(!music) return;
+        music.volume = 0.7;
+        music.play().catch(error=>{
+          console.warn('Autoplay blocked, will play on first user interaction.', error);
+          document.body.addEventListener('click', function onFirstClick(){
+            music.play().catch(()=>{});
+            document.body.removeEventListener('click', onFirstClick);
+          }, { once: true });
+        });
+      });
+
+      function onBlow(){
+        // extinguish flame
+        flame.classList.add('extinguished');
+        subtitle.textContent = 'Tes vœux se réalisent ! 💖';
+        // second confetti burst
+        launchConfetti(3000);
+        // ensure music playing
+        if(music){ music.volume = 0.7; music.play().catch(()=>{}); }
+        // redirect after 2s
+        setTimeout(()=>{ window.location.href = 'loading.html'; }, 2000);
+      }
+
+      blowBtn.addEventListener('click', onBlow);
+      candleWrap.addEventListener('click', onBlow);
+    })();
+  </script>
+</body>
+</html>

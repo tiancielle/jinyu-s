@@ -1,0 +1,56 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Chargement...</title>
+  <link href="https://fonts.googleapis.com/css2?family=Pacifico&display=swap" rel="stylesheet">
+  <style>
+    :root{--bg1:#FFE4E1;--bg2:#FFB6C1;--accent:#FF1493}
+    html,body{height:100%;margin:0;font-family:Pacifico,Arial,Helvetica,sans-serif;background:linear-gradient(135deg,var(--bg1) 0%,var(--bg2) 100%);display:flex;align-items:center;justify-content:center}
+    .loading-container{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:100vh;padding:24px}
+    .loading-title{font-size:28px;color:var(--accent);margin-bottom:24px}
+    .progress-bar-container{position:relative;width:500px;max-width:80%;height:40px;background:#FFE4E1;border:3px solid #FF69B4;border-radius:20px;overflow:hidden;box-shadow:0 5px 20px rgba(255,105,180,0.2)}
+    .progress-bar-fill{height:100%;background:linear-gradient(90deg,#FF69B4 0%,#FF1493 100%);width:0%;border-radius:18px;position:relative;transition:width .1s linear}
+    .loading-icon{position:absolute;top:50%;left:0%;transform:translate(-50%,-50%);width:120px;height:120px;object-fit:contain;transform-origin:center top;animation:swing 1.2s ease-in-out infinite}
+    .percentage{position:absolute;top:-36px;right:0;font-size:18px;color:var(--accent);font-weight:700}
+    @keyframes swing{0%{transform:translate(-50%,-50%) rotate(-20deg)}50%{transform:translate(-50%,-50%) rotate(20deg)}100%{transform:translate(-50%,-50%) rotate(-20deg)}}
+    @media (max-width:1024px){.loading-icon{width:90px;height:90px}}
+    @media (max-width:600px){.loading-title{font-size:22px}.progress-bar-container{height:36px}.loading-icon{width:60px;height:60px}}
+  </style>
+</head>
+<body>
+  <div class="loading-container">
+    <h1 class="loading-title">Préparation de ta surprise... ✨</h1>
+
+      <div class="progress-bar-container" role="progressbar" aria-valuemin="0" aria-valuemax="100">
+      <div class="progress-bar-fill" id="fill"></div>
+      <img src="res/loading/hali.png" alt="loading" class="loading-icon" id="icon">
+      <span class="percentage" id="percentage">0%</span>
+    </div>
+  </div>
+
+  <script>
+    (function(){
+      const fill = document.getElementById('fill');
+      const icon = document.getElementById('icon');
+      const percentEl = document.getElementById('percentage');
+      let percent = 0;
+      const stepMs = 100; // 100ms per step
+      const step = 2; // 2% per step -> 50 steps -> 5s
+
+      const interval = setInterval(()=>{
+        percent = Math.min(100, percent + step);
+        fill.style.width = percent + '%';
+        percentEl.textContent = percent + '%';
+        // move icon with bar but offset to sit outside the bar to the right
+        icon.style.left = `calc(${percent}% + 60px)`;
+        if(percent >= 100){
+          clearInterval(interval);
+          setTimeout(()=>{ window.location.href = 'final.html'; }, 500);
+        }
+      }, stepMs);
+    })();
+  </script>
+</body>
+</html>

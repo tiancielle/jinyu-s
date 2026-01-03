@@ -1,0 +1,281 @@
+<!doctype html>
+<html lang="fr">
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width,initial-scale=1">
+	<title>Memory - Joyeux Anniversaire Mon Amour !</title>
+	<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+	<style>
+		:root{
+			--baby-pink:#FFC0CB;
+			--soft-pink:#FFB6C1;
+			--deep-pink:#FF69B4;
+			--card-size-desktop:120px;
+			--card-size-mobile:80px;
+		}
+		*{box-sizing:border-box}
+		html,body{height:100%;margin:0;font-family:Poppins, Arial, sans-serif;background:var(--baby-pink);}
+		.wrap{min-height:100%;display:flex;align-items:center;justify-content:center;padding:24px}
+		.card-area{width:100%;max-width:960px;margin:0 auto;text-align:center}
+		.title{font-size:2.4rem;color:#b3003b;margin-bottom:12px;font-weight:700}
+		.subtitle{color:#8b0040;margin-bottom:20px}
+		.home{display:flex;flex-direction:column;align-items:center;gap:12px}
+		.btn{background:var(--deep-pink);color:white;padding:12px 28px;border-radius:999px;border:none;cursor:pointer;font-weight:700;box-shadow:0 6px 12px rgba(0,0,0,0.12);transition:transform .12s,filter .12s}
+		.btn:hover{transform:translateY(-3px);filter:brightness(1.03)}
+
+		/* Start button specific styling */
+		#startBtn{
+			width:300px;
+			height:70px;
+			font-size:24px;
+			font-weight:700;
+			border-radius:50px;
+			background:#FF69B4;
+			color:#fff;
+			border:none;
+			box-shadow:0 8px 15px rgba(255,105,180,0.3);
+			transition:transform .3s ease,box-shadow .3s ease;
+			display:inline-flex;align-items:center;justify-content:center;
+		}
+		#startBtn:hover{transform:scale(1.1);box-shadow:0 10px 20px rgba(255,105,180,0.5)}
+
+		@media (max-width:768px){
+			#startBtn{width:80%;max-width:320px}
+		}
+
+		.stats{display:flex;gap:16px;justify-content:center;margin:12px 0;color:#6b0030}
+		.stat{background:rgba(255,255,255,0.25);Padding:8px 12px;border-radius:12px;font-weight:600}
+
+		/* Grid */
+		.grid{display:grid;grid-template-columns:repeat(4,1fr);gap:18px;justify-items:center;margin-top:20px}
+
+		.card{
+			width:var(--card-size-desktop);height:var(--card-size-desktop);perspective:1000px;cursor:pointer
+		}
+		.card-inner{position:relative;width:100%;height:100%;transform-style:preserve-3d;transition:transform .6s}
+		.card.flipped .card-inner{transform:rotateY(180deg)}
+		.face{position:absolute;inset:0;border-radius:12px;backface-visibility:hidden;display:flex;align-items:center;justify-content:center;overflow:hidden;box-shadow:0 6px 18px rgba(0,0,0,0.12)}
+		.face.front{background:white;border:4px solid rgba(255,255,255,0.8);transform:rotateY(180deg)}
+		.face.back{background:linear-gradient(135deg,#ff7fbf,#ff4da6);color:white;font-size:2.4rem}
+		.face.back:before{content:'❤';font-size:2rem;opacity:.9}
+		.face img{max-width:90%;max-height:90%;display:block}
+
+		/* Reaction & layout */
+		.layout{display:flex;gap:18px;align-items:stretch}
+		.reaction-zone{flex:0 0 30%;display:flex;align-items:center;justify-content:center;padding:12px;border-radius:10px;background:rgba(255,182,193,0.12);height:100%}
+		.reaction-img{max-width:80%;height:auto;opacity:1;transition:opacity .5s ease}
+
+		@media (max-width:768px){
+			.layout{flex-direction:column}
+			.reaction-zone{width:100%;flex-basis:auto}
+		}
+
+		/* Overlay victory */
+		.overlay{position:fixed;inset:0;background:rgba(0,0,0,0.45);display:flex;align-items:center;justify-content:center;visibility:hidden;opacity:0;transition:opacity .2s,visibility .2s}
+		.overlay.show{visibility:visible;opacity:1}
+		.modal{background:linear-gradient(180deg,#fff0f6,#fff);padding:28px;border-radius:14px;text-align:center;box-shadow:0 20px 40px rgba(0,0,0,0.25);max-width:90%;}
+		.modal h2{margin:0 0 8px;color:#b3003b}
+		.modal p{margin:0 0 16px;color:#6b0030}
+
+		/* Responsive */
+		@media (max-width:600px){
+			.title{font-size:1.6rem}
+			.grid{gap:12px}
+			.card{width:var(--card-size-mobile);height:var(--card-size-mobile)}
+		}
+	</style>
+</head>
+<body>
+	<div class="wrap">
+		<div class="card-area">
+			<div class="home" id="home">
+				<h1 class="title">HALIMAAAA! 🎉</h1>
+				<div class="subtitle">A little Memory game for you — find all the pairs!</div>
+				<button class="btn" id="startBtn">Start game</button>
+			</div>
+
+			<section id="game" style="display:none">
+				<div class="layout">
+					<aside class="reaction-zone" style="flex:0 0 30%;display:flex;align-items:center;justify-content:center;padding:12px;border-radius:10px;background:rgba(255,182,193,0.25)">
+						<img id="reactionImg" class="reaction-img" src="res/images/reactions/start.jpg" alt="réaction" style="max-width:80%;height:auto;opacity:1;transition:opacity .5s">
+					</aside>
+
+					<div class="game-zone" style="flex:1 1 70%">
+						<div style="display:flex;flex-direction:column;align-items:center">
+							<div class="stats">
+								<div class="stat">Coups: <span id="moves">0</span></div>
+								<div class="stat">Paires: <span id="pairs">0</span>/8</div>
+							</div>
+							<div class="grid" id="grid" aria-live="polite"></div>
+							<button class="btn" id="restart" style="margin-top:18px;background:#ff4da6">Restart</button>
+						</div>
+					</div>
+				</div>
+			</section>
+		</div>
+	</div>
+
+
+
+	<script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+	<script>
+		(function(){
+			const startBtn = document.getElementById('startBtn');
+			const home = document.getElementById('home');
+			const game = document.getElementById('game');
+			const grid = document.getElementById('grid');
+			const movesEl = document.getElementById('moves');
+			const pairsEl = document.getElementById('pairs');
+    
+			const restart = document.getElementById('restart');
+
+			const TOTAL_PAIRS = 8;
+			let images = [];
+			for(let i=1;i<=TOTAL_PAIRS;i++) images.push('res/images/' + i + '.jpg');
+
+			let board = [];
+			let firstCard = null, secondCard = null;
+			let lock = false;
+			let moves = 0, pairs = 0;
+			let consecutiveErrors = 0;
+
+			const reactionMap = {
+				start: 'res/images/reactions/start.png',
+				keepgoing: 'res/images/reactions/keepgoing.png',
+				error1: 'res/images/reactions/error1.png',
+				error2: 'res/images/reactions/error2.png',
+				error3: 'res/images/reactions/error3.png',
+				almostthere: 'res/images/reactions/almostthere.png'
+			};
+
+			const reactionImgEl = document.getElementById('reactionImg');
+
+			function updateReaction(state){
+				const src = reactionMap[state];
+				if(!src || !reactionImgEl) return;
+				// fade out -> change src -> fade in
+				reactionImgEl.style.opacity = 0;
+				setTimeout(()=>{
+					reactionImgEl.src = src;
+					reactionImgEl.style.opacity = 1;
+				}, 200);
+			}
+
+			function shuffle(a){
+				for(let i=a.length-1;i>0;i--){
+					const j = Math.floor(Math.random()*(i+1));
+					[a[i],a[j]]=[a[j],a[i]];
+				}
+				return a;
+			}
+
+			function createBoard(){
+				board = shuffle([...images,...images]);
+				grid.innerHTML = '';
+				moves = 0; pairs = 0; consecutiveErrors = 0; updateStats();
+				board.forEach((imgSrc, idx)=>{
+					const card = document.createElement('div');
+					card.className = 'card';
+					card.dataset.index = idx;
+					card.dataset.image = imgSrc;
+					card.innerHTML = `
+						<div class="card-inner">
+							<div class="face back"></div>
+							<div class="face front"><img src="${imgSrc}" alt="carte"></div>
+						</div>`;
+					card.addEventListener('click', onCardClick);
+					grid.appendChild(card);
+				});
+				// show initial reaction
+				updateReaction('start');
+			}
+
+			function updateStats(){
+				movesEl.textContent = moves;
+				pairsEl.textContent = pairs;
+			}
+
+			function onCardClick(e){
+				const card = e.currentTarget;
+				if(lock) return;
+				if(card.classList.contains('matched') || card.classList.contains('flipped')) return;
+				flipCard(card);
+				if(!firstCard){
+					firstCard = card;
+					return;
+				}
+				secondCard = card;
+				lock = true;
+				moves++;
+				updateStats();
+
+				const imgA = firstCard.dataset.image;
+				const imgB = secondCard.dataset.image;
+				if(imgA === imgB){
+					// matched
+					setTimeout(()=>{
+						firstCard.classList.add('matched');
+						secondCard.classList.add('matched');
+						firstCard = null; secondCard = null; lock = false;
+						pairs++;
+						// reset consecutive errors and show success reaction
+						consecutiveErrors = 0;
+						updateReaction('keepgoing');
+						// if 6 pairs found (2 pairs left = 4 cards), show almost there
+						if(pairs === 6) updateReaction('almostthere');
+						updateStats();
+						if(pairs === TOTAL_PAIRS) onWin();
+					}, 300);
+				} else {
+					// not matched
+					consecutiveErrors++;
+					const errState = consecutiveErrors === 1 ? 'error1' : (consecutiveErrors === 2 ? 'error2' : 'error3');
+					updateReaction(errState);
+					setTimeout(()=>{
+						unflipCard(firstCard);
+						unflipCard(secondCard);
+						firstCard = null; secondCard = null; lock = false;
+					}, 1000);
+				}
+			}
+
+			function flipCard(card){
+				card.classList.add('flipped');
+			}
+			function unflipCard(card){
+				card.classList.remove('flipped');
+			}
+
+			function onWin(){
+				// confetti
+				if(window.confetti){
+					confetti({particleCount:140, spread:160, origin:{y:0.6}});
+				}
+				// redirect after short delay to let last pair show
+				setTimeout(()=>{
+					window.location.href = 'victory.html';
+				}, 1000);
+			}
+
+			function startGame(){
+				home.style.display = 'none';
+				game.style.display = 'block';
+				createBoard();
+			}
+
+			function resetGame(){
+				firstCard = null; secondCard = null; lock=false;
+				startGame();
+			}
+
+			startBtn.addEventListener('click', ()=>{startGame();});
+			restart.addEventListener('click', ()=>{resetGame();});
+    
+
+			// Initialize minimal (show home)
+			createBoard();
+		})();
+	</script>
+</body>
+</html>
+

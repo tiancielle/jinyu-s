@@ -4,43 +4,410 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
   <title>Final - Joyeux Anniversaire</title>
+  <!-- 🔧 Polices corrigées : espaces supprimés dans l'URL -->
   <link href="https://fonts.googleapis.com/css2?family=Pacifico&family=Quicksand:wght@400;600&display=swap" rel="stylesheet">
   <style>
-    :root{--bg1:#FFE4E1;--bg2:#FFB6C1;--accent:#FF1493}
-    html,body{height:100%;margin:0;font-family:Quicksand,Arial,sans-serif;background:linear-gradient(135deg,var(--bg1) 0%,var(--bg2) 100%);display:flex;align-items:center;justify-content:center}
-    .card{max-width:900px;padding:36px;border-radius:16px;text-align:center}
-    h1{font-family:Pacifico,Quicksand,Arial,sans-serif;color:var(--accent);font-size:48px;margin:6px}
-    .message{font-size:20px;color:#6b0030;margin-top:18px;line-height:1.6}
-    .hearts{position:fixed;left:0;top:0;pointer-events:none;width:100%;height:100%;overflow:hidden}
-    @media (max-width:600px){h1{font-size:32px}.message{font-size:18px}}
+    /* 🔧 Ajout pour cohérence du box-sizing */
+    *, *::before, *::after {
+      box-sizing: border-box;
+    }
+
+    :root {
+      --bg1: #FFE4E1;
+      --bg2: #FFB6C1;
+      --accent: #FF1493;
+    }
+
+    html, body {
+      height: 100%;
+      margin: 0;
+      padding: 0;
+      overflow: hidden;
+      font-family: Quicksand, Arial, sans-serif;
+      background: linear-gradient(135deg, var(--bg1) 0%, var(--bg2) 100%);
+    }
+
+    /* Main full-viewport container */
+    .main-container {
+      display: flex;
+      flex-direction: row;
+      height: 100vh;
+      width: 100vw;
+    }
+
+    /* Left: message (50% width, full height) */
+    .message-container {
+      width: 50%;
+      height: 100vh;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      padding: 40px 60px;
+    }
+
+    .message-card {
+      max-width: 600px;
+      width: 100%;
+      padding: 40px;
+      border-radius: 15px;
+      background: rgba(255, 255, 255, 0.85);
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+      text-align: left;
+    }
+
+    .message-card h1 {
+      font-family: Pacifico, Quicksand, Arial, sans-serif;
+      color: var(--accent);
+      font-size: 32px;
+      margin: 0 0 8px;
+    }
+
+    .message-body {
+      font-size: 18px;
+      color: #333;
+      line-height: 1.6;
+    }
+
+    .signature {
+      font-weight: 700;
+      margin-top: 12px;
+    }
+
+    /* Right: slideshow (50% width, full height) */
+    .slideshow-area {
+      width: 50%;
+      height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .slideshow-container {
+      position: relative;
+      width: 100%;
+      height: 100%;
+      border-radius: 0;
+      overflow: hidden;
+      background: #000;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .slide {
+      position: absolute;
+      left: 0;
+      top: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      /* ⚠️ Supprime border-radius pour plein écran */
+      border-radius: 0;
+      opacity: 0;
+      will-change: transform, opacity;
+      transition: opacity 0.5s ease;
+    }
+
+    .slide.visible {
+      opacity: 1;
+      z-index: 2;
+    }
+
+    .dots {
+      position: absolute;
+      left: 50%;
+      transform: translateX(-50%);
+      bottom: 30px;
+      display: flex;
+      gap: 10px;
+      z-index: 10;
+    }
+
+    .dot {
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      border: 2px solid rgba(255, 20, 147, 0.25);
+      background: transparent;
+      cursor: pointer;
+      padding: 0;
+    }
+
+    .dot.active {
+      background: var(--accent);
+      border-color: var(--accent);
+    }
+
+    .controls {
+      position: absolute;
+      left: 12px;
+      bottom: 12px;
+      z-index: 10;
+    }
+
+    .controls button {
+      background: rgba(255, 255, 255, 0.8);
+      border-radius: 6px;
+      padding: 6px 8px;
+      border: 0;
+      cursor: pointer;
+    }
+
+    /* Ken Burns */
+    @keyframes kenburns {
+      0% { transform: scale(1); }
+      100% { transform: scale(1.08); }
+    }
+
+    /* Transitions */
+    @keyframes fade { 0% { opacity: 0; } 100% { opacity: 1; } }
+    @keyframes slideRight { 0% { transform: translateX(100%); opacity: 0; } 100% { transform: translateX(0); opacity: 1; } }
+    @keyframes zoom { 0% { transform: scale(1.2); opacity: 0; } 100% { transform: scale(1); opacity: 1; } }
+    @keyframes rotate { 0% { transform: rotate(45deg) scale(0.8); opacity: 0; } 100% { transform: rotate(0deg) scale(1); opacity: 1; } }
+    @keyframes blur { 0% { filter: blur(8px); opacity: 0; } 100% { filter: blur(0); opacity: 1; } }
+
+    .fade { animation: fade 1000ms ease both; }
+    .slideRight { animation: slideRight 1000ms ease both; }
+    .zoom { animation: zoom 1000ms ease both; }
+    .rotate { animation: rotate 1000ms ease both; }
+    .blur { animation: blur 1000ms ease both; }
+
+    /* Responsive */
+    @media (max-width: 1024px) {
+      .message-container { width: 35%; }
+    }
+
+    @media (max-width: 768px) {
+      .main-container {
+        flex-direction: column;
+        height: 100vh;
+        overflow-y: auto;
+      }
+      .message-container {
+        width: 100%;
+        height: auto;
+        min-height: 50vh;
+        padding: 30px 20px;
+      }
+      .slideshow-area {
+        width: 100%;
+        height: 50vh;
+      }
+      .slideshow-container {
+        height: 100%;
+        min-height: 400px;
+      }
+      .dot {
+        width: 10px;
+        height: 10px;
+      }
+      html, body {
+        overflow: auto;
+      }
+    }
   </style>
 </head>
 <body>
-  <div class="card">
-    <h1>Joyeux Anniversaire Mon Amour ! 🎂❤️</h1>
-    <div class="message">
-      Mon amour,<br><br>
-      Aujourd'hui est un jour spécial parce que c'est le tien.<br>
-      Tu illumines chaque instant de ma vie. Tu es ma joie, mon rire, ma force, mon refuge.<br><br>
-      Merci d'exister et d'être toi.<br>
-      Je t'aime plus que tout au monde.<br><br>
-      Joyeux anniversaire, mon trésor ! 💖✨<br><br>
-      Avec tout mon amour,
-      <div style="font-weight:700;margin-top:12px">— [Ton prénom]</div>
-    </div>
+  <!-- 🔧 Correction : "container" → "main-container" -->
+  <div class="main-container">
+    <aside class="message-container">
+      <div class="message-card">
+        <h1>Happy birthday sadiqatiii ! 🎂❤️</h1>
+        <div class="message-body">
+          Eomri!   <br>
+          May your day shine as brightly as your soul, filled with laughter that echoes your joy and moments that celebrate the incredible person you are.  
+          Here’s to another year of triumphs, adventures, and memories so beautiful they’ll warm your heart for years to come.  
+          May you be wrapped in love, lifted by joy, and spoiled by all the little things that make your eyes sparkle—you truly deserve every happiness, today and forever. 💖<br><br>
+          With all my love,<br>
+          <div class="signature">— Hiba</div>
+        </div>
+      </div>
+    </aside>
+
+    <main class="slideshow-area">
+      <div class="slideshow-container" id="slideshow" aria-live="polite">
+        <img class="slide photo a" id="photoA" src="" alt="photo souvenir A">
+        <img class="slide photo b" id="photoB" src="" alt="photo souvenir B">
+
+        <div class="dots" id="dots" aria-hidden="false"></div>
+        <div class="controls">
+          <button id="muteBtn" aria-label="Pause/Play musique">🔊</button>
+        </div>
+      </div>
+    </main>
   </div>
 
+  <audio id="birthdayMusic" loop>
+    <source src="res/sounds/bday.mp3" type="audio/mpeg">
+  </audio>
+
   <div class="hearts" id="hearts"></div>
-  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+  <!-- ✅ CDN alternatif pour éviter les warnings de tracking -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/canvas-confetti/1.6.0/confetti.browser.min.js"></script>
   <script>
     (function(){
-      // gentle confetti
-      if(window.confetti){
-        setInterval(()=>{
-          confetti({particleCount: 6, spread: 40, origin: { x: Math.random() }, colors:['#FFB6C1','#FF69B4','#FFC0CB']});
-        }, 600);
+      const photos = [
+        'res/album/1.jpeg',
+        'res/album/2.jpeg',
+        'res/album/3.jpeg',
+        'res/album/4.jpeg',
+        'res/album/5.jpeg',
+        'res/album/6.jpeg',
+        'res/album/7.jpeg',
+        'res/album/8.jpeg',
+        'res/album/9.jpeg',
+        'res/album/10.jpeg',
+        'res/album/11.jpeg',
+        'res/album/12.jpeg',
+        'res/album/13.jpeg'
+      ];
+
+      const transitions = ['fade', 'slideRight', 'zoom', 'rotate', 'blur'];
+      const displayMs = 4000;
+      const transitionMs = 1000;
+
+      const photoA = document.getElementById('photoA');
+      const photoB = document.getElementById('photoB');
+      const dotsEl = document.getElementById('dots');
+      const slideshow = document.getElementById('slideshow');
+
+      let current = 0;
+      let frontIsA = true;
+      let transitionIndex = 0;
+      let isPaused = false;
+      let timerId = null;
+
+      // Preload images
+      const preloaded = [];
+      photos.slice(0, 20).forEach((p, i) => {
+        const img = new Image();
+        img.src = p;
+        img.alt = 'Photo souvenir';
+        preloaded.push(img);
+      });
+
+      function buildDots() {
+        dotsEl.innerHTML = '';
+        photos.forEach((_, i) => {
+          const d = document.createElement('button');
+          d.className = 'dot';
+          d.setAttribute('data-index', i);
+          d.setAttribute('aria-label', 'Aller à la photo ' + (i + 1));
+          d.addEventListener('click', () => goTo(i));
+          dotsEl.appendChild(d);
+        });
+      }
+
+      function updateDots() {
+        Array.from(dotsEl.children).forEach((b, idx) => {
+          b.classList.toggle('active', idx === current);
+        });
+      }
+
+      function applyTransition(el, name) {
+        el.style.animation = `${name} ${transitionMs}ms ease both, kenburns ${displayMs}ms ease-out both`;
+      }
+
+      function showNext() {
+        const next = (current + 1) % photos.length;
+        transitionIndex = (transitionIndex + 1) % transitions.length;
+        showPhoto(next, transitions[transitionIndex]);
+      }
+
+      function showPhoto(index, transitionName) {
+        const inEl = frontIsA ? photoB : photoA;
+        const outEl = frontIsA ? photoA : photoB;
+        inEl.src = photos[index];
+        inEl.alt = 'Photo souvenir ' + (index + 1);
+        inEl.classList.add('visible');
+        outEl.classList.remove('visible');
+        applyTransition(inEl, transitionName || transitions[transitionIndex]);
+        current = index;
+        frontIsA = !frontIsA;
+        updateDots();
+      }
+
+      function startSlideshow() {
+        if (timerId) clearInterval(timerId);
+        timerId = setInterval(() => {
+          if (!isPaused) showNext();
+        }, displayMs);
+      }
+
+      function pauseSlideshow() { isPaused = true; }
+      function resumeSlideshow() { isPaused = false; }
+
+      function goTo(i) {
+        transitionIndex = (transitionIndex + 1) % transitions.length;
+        showPhoto(i, transitions[transitionIndex]);
+        startSlideshow();
+      }
+
+      slideshow.addEventListener('mouseenter', () => pauseSlideshow());
+      slideshow.addEventListener('mouseleave', () => resumeSlideshow());
+
+      // Init
+      buildDots();
+      photoA.src = photos[0];
+      photoA.alt = 'Photo souvenir 1';
+      photoA.classList.add('visible');
+      photoA.style.animation = `kenburns ${displayMs}ms ease-out both`;
+      updateDots();
+      startSlideshow();
+
+      // Music
+      const music = document.getElementById('birthdayMusic');
+      music.volume = 0.6;
+      const muteBtn = document.getElementById('muteBtn');
+      let musicPlaying = false;
+
+      function tryPlayMusic() {
+        music.play().then(() => {
+          musicPlaying = true;
+          muteBtn.textContent = '🔊';
+        }).catch(() => {
+          muteBtn.textContent = '▶️';
+          document.body.addEventListener('click', function once() {
+            music.play().then(() => {
+              musicPlaying = true;
+              muteBtn.textContent = '🔊';
+            }).catch(() => {});
+            document.body.removeEventListener('click', once);
+          }, { once: true });
+        });
+      }
+
+      tryPlayMusic();
+
+      muteBtn.addEventListener('click', () => {
+        if (musicPlaying) {
+          music.pause();
+          musicPlaying = false;
+          muteBtn.textContent = '🔈';
+        } else {
+          music.play().then(() => {
+            musicPlaying = true;
+            muteBtn.textContent = '🔊';
+          }).catch(() => {
+            muteBtn.textContent = '▶️';
+          });
+        }
+      });
+
+      // Confetti
+      if (window.confetti) {
+        setInterval(() => {
+          confetti({
+            particleCount: 6,
+            spread: 40,
+            origin: { x: Math.random() },
+            colors: ['#FFB6C1', '#FF69B4', '#FFC0CB']
+          });
+        }, 800);
       }
     })();
   </script>
 </body>
-</html>
+</html><!doctype html>

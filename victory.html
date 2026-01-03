@@ -65,7 +65,7 @@
       </div>
 
       <div class="action-row">
-        <button id="blowBtn" class="btn" style="background:#FF69B4;padding:12px 22px;border-radius:999px;color:#fff;border:none;box-shadow:0 10px 20px rgba(255,105,180,0.25);">Souffler la bougie 🕯️</button>
+        <button id="blowBtn" class="btn" style="background:#FF69B4;padding:12px 22px;border-radius:999px;color:#fff;border:none;box-shadow:0 10px 20px rgba(255,105,180,0.25);">Blow the candle</button>
         <div class="hint">Clic on the candle or the button to blow it out</div>
       </div>
     </div>
@@ -114,7 +114,7 @@
       function onBlow(){
         // extinguish flame
         flame.classList.add('extinguished');
-        subtitle.textContent = 'Tes vœux se réalisent ! 💖';
+        subtitle.textContent = 'Your wishes will come true ! 💖';
         // second confetti burst
         launchConfetti(3000);
         // ensure music playing
